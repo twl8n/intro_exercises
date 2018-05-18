@@ -1,0 +1,156 @@
+> sqlite3 demo.db
+SQLite version 3.8.11.1 2015-07-29 20:00:57
+Enter ".help" for usage hints.
+sqlite> create table person (
+   ...> id int autoincrement unique,
+   ...> name text);
+Error: near "autoincrement": syntax error
+sqlite> create table person (
+   ...> id int primary key autoincrement,
+   ...> name text);
+Error: AUTOINCREMENT is only allowed on an INTEGER PRIMARY KEY
+sqlite> create table person (
+   ...> id integer primary key autoincrement,
+   ...> name text);
+sqlite> .tables
+person
+sqlite> .schema
+CREATE TABLE person (
+id integer primary key autoincrement,
+name text);
+sqlite> insert into person (name) values ('Ada Lovelace');
+sqlite> insert into person (name) values ('Paul Kleene');
+sqlite> select * from person;
+1|Ada Lovelace
+2|Paul Kleene
+sqlite> select * from person where name like '%love%';
+1|Ada Lovelace
+sqlite> select * from person limit 1;
+1|Ada Lovelace
+sqlite> create table address (
+   ...> id integer primary key autoincrement,
+   ...> street text,
+   ...> city text,
+   ...> zip text);
+sqlite> insert into address (street, city,zip) values ('123 Maple St','Light City','45241');
+sqlite> create table p_to_a (
+   ...> integer person_id,
+   ...> integer address_id);
+Error: duplicate column name: integer
+sqlite> create table p_to_a (
+   ...> person_id integer,
+   ...> address_id integer);
+sqlite> select * from address;
+1|123 Maple St|Light City|45241
+sqlite> select * from person;
+1|Ada Lovelace
+2|Paul Kleene
+sqlite> insert into p_to_a values (1,2);
+sqlite> select * from person,address where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+Error: no such column: p_to_a.person_id
+sqlite> .schema
+CREATE TABLE person (
+id integer primary key autoincrement,
+name text);
+CREATE TABLE address (
+id integer primary key autoincrement,
+street text,
+city text,
+zip text);
+CREATE TABLE p_to_a (
+person_id integer,
+address_id integer);
+sqlite> select * from person,address where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+Error: no such column: p_to_a.person_id
+sqlite> select * from person,address,p_to_a where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+sqlite> select * from p_to_a;
+1|2
+sqlite> .help
+.backup ?DB? FILE      Backup DB (default "main") to FILE
+.bail on|off           Stop after hitting an error.  Default OFF
+.binary on|off         Turn binary output on or off.  Default OFF
+.clone NEWDB           Clone data into NEWDB from the existing database
+.databases             List names and files of attached databases
+.dbinfo ?DB?           Show status information about the database
+.dump ?TABLE? ...      Dump the database in an SQL text format
+                         If TABLE specified, only dump tables matching
+                         LIKE pattern TABLE.
+.echo on|off           Turn command echo on or off
+.eqp on|off            Enable or disable automatic EXPLAIN QUERY PLAN
+.exit                  Exit this program
+.explain ?on|off?      Turn output mode suitable for EXPLAIN on or off.
+                         With no args, it turns EXPLAIN on.
+.fullschema            Show schema and the content of sqlite_stat tables
+.headers on|off        Turn display of headers on or off
+.help                  Show this message
+.import FILE TABLE     Import data from FILE into TABLE
+.indexes ?TABLE?       Show names of all indexes
+                         If TABLE specified, only show indexes for tables
+                         matching LIKE pattern TABLE.
+.limit ?LIMIT? ?VAL?   Display or change the value of an SQLITE_LIMIT
+.load FILE ?ENTRY?     Load an extension library
+.log FILE|off          Turn logging on or off.  FILE can be stderr/stdout
+.mode MODE ?TABLE?     Set output mode where MODE is one of:
+                         ascii    Columns/rows delimited by 0x1F and 0x1E
+                         csv      Comma-separated values
+                         column   Left-aligned columns.  (See .width)
+                         html     HTML <table> code
+                         insert   SQL insert statements for TABLE
+                         line     One value per line
+                         list     Values delimited by .separator strings
+                         tabs     Tab-separated values
+                         tcl      TCL list elements
+.nullvalue STRING      Use STRING in place of NULL values
+.once FILENAME         Output for the next SQL command only to FILENAME
+.open ?FILENAME?       Close existing database and reopen FILENAME
+.output ?FILENAME?     Send output to FILENAME or stdout
+.print STRING...       Print literal STRING
+.prompt MAIN CONTINUE  Replace the standard prompts
+.quit                  Exit this program
+.read FILENAME         Execute SQL in FILENAME
+.restore ?DB? FILE     Restore content of DB (default "main") from FILE
+.save FILE             Write in-memory database into FILE
+.scanstats on|off      Turn sqlite3_stmt_scanstatus() metrics on or off
+.schema ?TABLE?        Show the CREATE statements
+                         If TABLE specified, only show tables matching
+                         LIKE pattern TABLE.
+.separator COL ?ROW?   Change the column separator and optionally the row
+                         separator for both the output mode and .import
+.shell CMD ARGS...     Run CMD ARGS... in a system shell
+.show                  Show the current values for various settings
+.stats on|off          Turn stats on or off
+.system CMD ARGS...    Run CMD ARGS... in a system shell
+.tables ?TABLE?        List names of tables
+                         If TABLE specified, only list tables matching
+                         LIKE pattern TABLE.
+.timeout MS            Try opening locked tables for MS milliseconds
+.timer on|off          Turn SQL timer on or off
+.trace FILE|off        Output each SQL statement as it is run
+.vfsname ?AUX?         Print the name of the VFS stack
+.width NUM1 NUM2 ...   Set column widths for "column" mode
+                         Negative values right-justify
+sqlite> .headers on
+sqlite> select * from p_to_a;
+person_id|address_id
+1|2
+sqlite> delete from p_to_a;
+sqlite> select * from person;
+id|name
+1|Ada Lovelace
+2|Paul Kleene
+sqlite> select * from address;
+id|street|city|zip
+1|123 Maple St|Light City|45241
+sqlite> insert into p_to_a values (2,1);
+sqlite> select * from person,address,p_to_a where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+id|name|id|street|city|zip|person_id|address_id
+2|Paul Kleene|1|123 Maple St|Light City|45241|2|1
+sqlite> .mode column
+sqlite> select * from person,address,p_to_a where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+id          name         id          street        city        zip         person_id   address_id
+----------  -----------  ----------  ------------  ----------  ----------  ----------  ----------
+2           Paul Kleene  1           123 Maple St  Light City  45241       2           1         
+sqlite> .q
+  * 0 * twl@hagrid __ Thu May 17 22:18:52 EDT 2018 __   ps:
+  hagrid:/Users/twl
+>

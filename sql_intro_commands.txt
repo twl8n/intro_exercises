@@ -1,0 +1,76 @@
+
+-- This is a SQL comment
+
+-- Feel free to experiment with statements. SQLite has fairly good docs online.
+-- No need to worry about syntax at this point. Soon.
+
+-- Opps. "int" is not a data type but "integer" is.
+create table person (
+id int primary key autoincrement,
+name text);
+
+CREATE TABLE person (
+id integer primary key autoincrement,
+name text);
+
+.tables
+
+.schema
+
+-- SQL strings use the ' single quote, the character next to the return key.
+insert into person (name) values ('Ada Lovelace');
+
+insert into person (name) values ('Paul Kleene');
+
+select * from person;
+
+-- SQL wildcard matches any character or characters is %
+select * from person where name like '%love%';
+
+select * from person limit 1;
+
+create table address (
+id integer primary key autoincrement,
+street text,
+city text,
+zip text);
+
+insert into address (street, city,zip) values ('123 Maple St','Light City','45241');
+
+-- Opps! Wrong syntax. Correct syntax for table columns is <column-name> <data-type>
+create table p_to_a (
+integer person_id,
+integer address_id);
+
+
+-- This is a linking table because it links person to address
+create table p_to_a (
+person_id integer,
+address_id integer);
+
+-- Not SQL commands, but sqlite3 utility specific.
+.headers on
+.mode column
+
+select * from address;
+
+select * from person;
+
+-- This is a mistake, but I didn't know it yet. I got my persson.id and address.id reversed.
+insert into p_to_a values (1,2);
+
+-- Opps. Forgot to include table p_to_a in the from
+-- select <columns> from <tables> where <constraints>;
+select * from person,address where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+
+-- Opps. The query is right, but the data is bad.
+select * from person,address,p_to_a where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+
+delete from p_to_a;
+
+insert into p_to_a values (2,1);
+
+select * from person,address,p_to_a where person.id=p_to_a.person_id and address.id=p_to_a.address_id;
+
+.q
+
